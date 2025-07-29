@@ -1,0 +1,166 @@
+---
+// src/components/Sidebar.astro
+import { ui } from '../i18n/ui';
+
+// Usar Astro.currentLocale é a forma padrão e mais segura de obter o idioma.
+const locale = Astro.currentLocale as keyof typeof ui;
+const t = (key: keyof typeof ui[typeof locale]) => {
+  return ui[locale][key];
+};
+
+const pathname = Astro.url.pathname;
+
+// Função aprimorada para verificar o link ativo.
+// Compara o caminho base, ignorando o prefixo de idioma.
+const isActive = (href: string) => {
+    const pathWithoutLang = pathname.replace(/^\/(en-US|pt-BR)/, '') || '/';
+    const hrefWithoutLang = href.replace(/^\/(en-US|pt-BR)/, '') || '/';
+    return pathWithoutLang === hrefWithoutLang;
+}
+---
+<nav class="sidebar">
+    <div class="sidebar-header">
+        <a href={`/${locale}/`} class="sidebar-logo-link">
+            <h1>DM Yan</h1>
+            <h2>{t('header.title')}</h2>
+        </a>
+    </div>
+    <ul>
+        <li>
+            <a href={`/${locale}/`} class:list={{ active: isActive('/') }}>
+                <i class="fas fa-home"></i>
+                <span>{t('nav.grimoire')}</span>
+            </a>
+        </li>
+        <li>
+            <a href={`/${locale}/campaigns`} class:list={{ active: isActive('/campaigns') }}>
+                <i class="fas fa-book-open"></i>
+                <span>{t('nav.campaigns')}</span>
+            </a>
+        </li>
+        <li>
+            <a href={`/${locale}/guides`} class:list={{ active: isActive('/guides') }}>
+                <i class="fas fa-scroll"></i>
+                <span>{t('nav.guides')}</span>
+            </a>
+        </li>
+        <li>
+            <a href={`/${locale}/tools`} class:list={{ active: isActive('/tools') }}>
+                <i class="fas fa-tools"></i>
+                <span>{t('nav.tools')}</span>
+            </a>
+        </li>
+    </ul>
+    <div class="sidebar-footer">
+        <a href="https://instagram.com/dungeonmasteryan" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="https://youtube.com/@dmyan368" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="https://divulgacao.yanbraga.com/discord" target="_blank" title="Discord"><i class="fab fa-discord"></i></a>
+    </div>
+</nav>
+
+<style>
+/* Estilos do componente, agora sem as regras de posicionamento conflitantes */
+.sidebar {
+    width: 260px;
+    min-height: 100vh;
+    border-right: 2px solid var(--cor-borda);
+    padding: 1.5rem;
+    background-color: var(--cor-fundo);
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+/* Adicionando a regra de sticky de volta, mas apenas para telas grandes */
+@media (min-width: 993px) {
+    .sidebar {
+        position: sticky;
+        top: 0;
+    }
+}
+
+.sidebar-header {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.sidebar-header .sidebar-logo-link {
+    text-decoration: none;
+}
+
+.sidebar-header h1 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-destaque);
+    margin: 0;
+    font-size: 2.2rem;
+}
+
+.sidebar-header h2 {
+    font-family: var(--fonte-corpo);
+    color: var(--cor-texto);
+    font-weight: 300;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    flex-grow: 1;
+}
+
+.sidebar ul li a {
+    color: var(--cor-texto);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 1.1rem;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    background-color: var(--cor-fundo-item);
+    color: var(--cor-destaque);
+}
+
+.sidebar ul li a.disabled-link {
+    color: var(--cor-borda);
+    cursor: not-allowed;
+}
+.sidebar ul li a.disabled-link:hover {
+    background-color: transparent;
+    color: var(--cor-borda);
+}
+
+.sidebar ul li a i {
+    margin-right: 15px;
+    width: 20px;
+    text-align: center;
+    color: var(--cor-destaque);
+    transition: color 0.3s ease;
+}
+
+.sidebar-footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--cor-borda);
+}
+
+.sidebar-footer a {
+    color: var(--cor-texto);
+    margin: 0 0.75rem;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.sidebar-footer a:hover {
+    color: var(--cor-destaque);
+}
+</style>

@@ -1,0 +1,207 @@
+---
+// src/pages/[lang]/campaigns.astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+// CORREÇÃO: Removido '-v2' do caminho de importação
+import HeaderControls from '../../components/HeaderControls.astro'; 
+import ScheduleCard from '../../components/ScheduleCard.astro';
+import { ui } from '../../i18n/ui';
+import { rawScheduleData } from '../../data/campaigns';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'pt-BR' } }, { params: { lang: 'en-US' } }];
+}
+
+const locale = Astro.currentLocale as keyof typeof ui;
+const t = (key: keyof typeof ui[typeof locale]) => ui[locale][key];
+
+// LÓGICA PARA PROCESSAR E SEPARAR OS DADOS EM CATEGORIAS
+const recruitingGames: any[] = [];
+const availableSlots: any[] = [];
+const fullGames: any[] = [];
+
+rawScheduleData.forEach(game => {
+    const [current, max] = game.vacancies.split('/').map(Number);
+    let status: 'recruiting' | 'full' | 'available' = 'full';
+
+    if (game.name === "available") {
+        status = 'available';
+    } else if (current < max) {
+        status = 'recruiting';
+    }
+
+    const translatedDay = typeof game.day === 'object' ? game.day[locale] : game.day;
+    const translatedFrequency = typeof game.frequency === 'object' ? game.frequency[locale] : game.frequency;
+
+    const processedGame = {
+        ...game,
+        status,
+        day: translatedDay,
+        frequency: translatedFrequency,
+        name: game.name === 'available' ? t('contact.title') : game.name,
+        theme: game.theme || t('schedule.contact_for_new'),
+        image: game.image || "/images/campaigns/available-slot.jpg",
+        lang: game.lang || "-",
+        level: game.level || "-",
+        price: game.price || "-",
+        payment: game.payment || "-",
+        link: game.link || "#",
+        premise: game.premise || ""
+    };
+
+    if (status === 'recruiting') {
+        recruitingGames.push(processedGame);
+    } else if (status === 'available') {
+        availableSlots.push(processedGame);
+    } else {
+        fullGames.push(processedGame);
+    }
+});
+---
+<BaseLayout 
+    title={t('campaigns.pageTitle')}
+    description={t('campaigns.pageDescription')}>
+
+    <Sidebar />
+
+    <main class="content">
+        <HeaderControls />
+
+        <div class="page-header-minimal">
+            <h1>{t('campaigns.pageTitle')}</h1>
+            <p>{t('campaigns.pageDescription')}</p>
+        </div>
+
+        <!-- Seção para Vagas Abertas -->
+        <section id="recruiting-section">
+            <h2 class="section-title">{t('section.title.recruiting')}</h2>
+            <div class="schedule-grid">
+                {recruitingGames.length > 0 ? (
+                    recruitingGames.map(game => <ScheduleCard game={game} />)
+                ) : (
+                    <p>{/* Mensagem opcional se não houver vagas */}</p>
+                )}
+            </div>
+        </section>
+
+        <!-- Seção para Horários Disponíveis -->
+        <section id="available-section">
+            <h2 class="section-title">{t('section.title.available')}</h2>
+            <div class="schedule-grid">
+                {availableSlots.map(game => (
+                    <div class="schedule-card available-card">
+                        <img src={game.image} alt="Horário disponível" class="card-banner" />
+                        <div class="card-content">
+                            <div class="card-header">
+                                <span class="day-time">{game.day} - {game.time}</span>
+                                <h3>{game.name}</h3>
+                                <p class="theme">{game.theme}</p>
+                            </div>
+                            <p class="contact-text">{t('contact.text')}</p>
+                            <div class="card-footer">
+                                <a href="https://discordapp.com/users/223966478284554241" class="contact-button discord" target="_blank">
+                                    <i class="fab fa-discord"></i> {t('contact.cta.discord')}
+                                </a>
+                                <a href="https://wa.me/5551994073359" class="contact-button whatsapp" target="_blank">
+                                    <i class="fab fa-whatsapp"></i> {t('contact.cta.whatsapp')}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
+
+        <!-- Seção para Mesas Lotadas -->
+        <section id="full-section">
+            <h2 class="section-title">{t('section.title.full')}</h2>
+            <div class="schedule-grid">
+                {fullGames.map(game => <ScheduleCard game={game} />)}
+            </div>
+        </section>
+    </main>
+</BaseLayout>
+
+<script>
+    // Lógica para controlar todos os modais da página (continua necessária)
+    document.addEventListener('astro:page-load', () => {
+        document.querySelectorAll('[data-modal-target]').forEach(button => {
+            button.addEventListener('click', () => {
+                const target = button.getAttribute('data-modal-target');
+                if (target) {
+                    document.querySelector(target)?.classList.add('active');
+                }
+            });
+        });
+
+        const closeModal = (modal: Element | null) => {
+            modal?.classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal-close').forEach(button => {
+            button.addEventListener('click', () => closeModal(button.closest('.modal-overlay')));
+        });
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    closeModal(overlay);
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+/* Estilos da página de campanhas */
+.page-header-minimal h1 { font-family: var(--fonte-titulo); color: var(--cor-destaque); font-size: 3.5rem; margin: 0; border-bottom: 2px solid var(--cor-borda); padding-bottom: 1rem; }
+.page-header-minimal p { font-size: 1.2rem; color: var(--cor-texto); max-width: 80ch; margin-top: 0.5rem; }
+section { margin-bottom: 4rem; }
+
+.section-title {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-destaque);
+    font-size: 2.5rem;
+    border-bottom: 1px solid var(--cor-borda);
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 2rem;
+}
+
+/* Estilos para o card de horário vago */
+.available-card {
+    border-style: dashed;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--cor-fundo-item);
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.available-card .contact-text {
+    flex-grow: 1;
+    margin: 1.5rem 0;
+}
+.contact-button {
+    flex-grow: 1;
+    padding: 0.75rem;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #fff;
+}
+.contact-button.discord { background-color: #5865F2; }
+.contact-button.discord:hover { background-color: #4752c4; }
+.contact-button.whatsapp { background-color: #25D366; }
+.contact-button.whatsapp:hover { background-color: #1da851; }
+</style>

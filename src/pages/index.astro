@@ -1,11 +1,9 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+// src/pages/index.astro
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Redireciona da raiz (/) para a página do idioma padrão (/pt-BR/).
+// Usar o valor estático '/pt-BR/' aqui é a forma mais robusta de criar
+// este redirecionamento, pois evita potenciais problemas de importação
+// ou de contexto com os módulos virtuais do Astro, resolvendo o erro.
+return Astro.redirect('/pt-BR/');
 ---
-
-<Layout>
-	<Welcome />
-</Layout>

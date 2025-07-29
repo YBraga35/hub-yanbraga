@@ -1,0 +1,96 @@
+/* src/styles/global.css */
+
+:root {
+  --fonte-titulo: 'MedievalSharp', cursive;
+  --fonte-corpo: 'Lora', serif;
+}
+
+html.dark-theme {
+  --cor-fundo: #1e1e24;
+  --cor-fundo-item: #2a2a30;
+  --cor-texto: #d8c3a5;
+  --cor-destaque: #9a6941;
+  --cor-borda: #504A4B;
+}
+
+html.light-theme {
+  --cor-fundo: #fdfaf5;
+  --cor-fundo-item: #ffffff;
+  --cor-texto: #4a3f35;
+  --cor-destaque: #8c6d52;
+  --cor-borda: #dcd1c1;
+}
+
+body {
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    font-family: var(--fonte-corpo);
+    margin: 0;
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.main-container {
+    display: flex;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 1.5rem 3rem;
+    box-sizing: border-box;
+    width: calc(100% - 260px);
+}
+
+/* === REGRAS DE RESPONSIVIDADE PARA MOBILE === */
+
+@media (max-width: 992px) {
+    .content {
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    /* Esconde a sidebar fora da tela por padrão */
+    .sidebar { 
+        position: fixed; 
+        left: -300px; 
+        top: 0; 
+        height: 100%; 
+        width: 280px; 
+        box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+        transition: left 0.3s ease-in-out;
+    }
+
+    /* Mostra a sidebar quando o body tiver a classe .sidebar-open */
+    body.sidebar-open .sidebar { 
+        left: 0; 
+    }
+
+    /* Estilos para o fundo escuro quando o menu está aberto */
+    .mobile-menu-overlay { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background-color: rgba(0,0,0,0.5); 
+        z-index: 99; 
+        opacity: 0; 
+        visibility: hidden; 
+        transition: opacity 0.3s, visibility 0.3s; 
+    }
+
+    body.sidebar-open .mobile-menu-overlay { 
+        opacity: 1; 
+        visibility: visible; 
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 1.5rem 1rem;
+    }
+}

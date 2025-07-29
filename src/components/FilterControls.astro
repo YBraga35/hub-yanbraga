@@ -1,0 +1,83 @@
+---
+// src/components/FilterControls.astro
+import { ui } from '../i18n/ui';
+
+const locale = Astro.currentLocale as keyof typeof ui;
+const t = (key: keyof typeof ui[typeof locale]) => ui[locale][key];
+---
+<div class="filter-controls" id="filter-controls">
+    <button type="button" class="filter-button active" data-filter="all">{t('filter.all')}</button>
+    <button type="button" class="filter-button" data-filter="recruiting">{t('filter.recruiting')}</button>
+    <button type="button" class="filter-button" data-filter="available">{t('filter.available')}</button>
+    <button type="button" class="filter-button" data-filter="full">{t('filter.full')}</button>
+</div>
+
+<script>
+// Este script agora vai controlar a visibilidade dos cards
+document.addEventListener('astro:page-load', () => {
+  const filterContainer = document.getElementById('filter-controls');
+  const scheduleGrid = document.getElementById('schedule-grid');
+
+  if (!filterContainer || !scheduleGrid) return;
+
+  const filterButtons = filterContainer.querySelectorAll('.filter-button');
+  const scheduleCards = scheduleGrid.querySelectorAll('.card-wrapper');
+
+  filterContainer.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    if (!target.matches('.filter-button')) return;
+
+    const filterValue = target.dataset.filter;
+
+    // Atualiza o botão ativo
+    filterButtons.forEach(button => button.classList.remove('active'));
+    target.classList.add('active');
+
+    // Aplica o filtro aos cards
+    scheduleCards.forEach(card => {
+      const cardElement = card as HTMLElement;
+      const cardStatus = cardElement.dataset.status;
+
+      // A mágica acontece aqui: mostra ou esconde o card
+      if (filterValue === 'all' || filterValue === cardStatus) {
+        cardElement.style.display = 'flex'; // ou 'block'
+      } else {
+        cardElement.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
+
+<style>
+.filter-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.filter-button {
+    background-color: var(--cor-fundo-item);
+    border: 1px solid var(--cor-borda);
+    color: var(--cor-texto);
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.filter-button:hover {
+    background-color: var(--cor-borda);
+    color: var(--cor-destaque);
+}
+.filter-button.active {
+    background-color: var(--cor-destaque);
+    color: var(--cor-fundo);
+    border-color: var(--cor-destaque);
+}
+html.light-theme .filter-button.active {
+    color: #fff;
+}
+</style>

@@ -1,0 +1,66 @@
+---
+// src/pages/[lang]/tools.astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import HeaderControls from '../../components/HeaderControls.astro';
+import { ui } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'pt-BR' } }, { params: { lang: 'en-US' } }];
+}
+
+const locale = Astro.currentLocale as keyof typeof ui;
+const t = (key: keyof typeof ui[typeof locale]) => ui[locale][key];
+---
+<BaseLayout 
+    title={t('nav.tools')}
+    description="Uma curadoria de ferramentas úteis para suas sessões de RPG.">
+
+    <Sidebar />
+
+    <main class="content">
+        <HeaderControls />
+
+        <div class="page-header-minimal">
+            <h1>{t('nav.tools')}</h1>
+            <p>Uma seleção de recursos que eu pessoalmente uso e recomendo para facilitar a vida na mesa de jogo.</p>
+        </div>
+
+        <div class="placeholder-grid">
+            <div class="placeholder-card">
+                <i class="fas fa-dice"></i>
+                <h3>Geradores de Nomes de Fantasia</h3>
+                <p>O melhor e mais completo gerador de nomes para D&D e outros sistemas. Essencial para criar NPCs de improviso.</p>
+                <a href="https://www.fantasynamegenerators.com/dnd-human-names.php" target="_blank" class="tool-link">Visitar Fantasy Name Generators</a>
+            </div>
+            <div class="placeholder-card">
+                <i class="fas fa-music"></i>
+                <h3>Tabletop Audio</h3>
+                <p>Um recurso incrível para ambiência sonora. Crie a atmosfera perfeita para qualquer cena, de uma taverna movimentada a uma masmorra assustadora.</p>
+                <a href="https://tabletopaudio.com/" target="_blank" class="tool-link">Visitar Tabletop Audio</a>
+            </div>
+             <div class="placeholder-card">
+                <i class="fas fa-map-marked-alt"></i>
+                <h3>Criadores de Mapas</h3>
+                <p>Ferramentas como Inkarnate e Wonderdraft para criar desde mapas de vilarejos a continentes inteiros com um visual profissional.</p>
+                 <a href="https://inkarnate.com/" target="_blank" class="tool-link">Visitar Inkarnate</a>
+            </div>
+        </div>
+    </main>
+</BaseLayout>
+
+<style is:global>
+/* Reutiliza os estilos de .placeholder-grid e .placeholder-card da página de guias */
+.tool-link {
+    color: var(--cor-destaque);
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 1rem;
+    align-self: flex-start;
+    transition: color 0.3s ease;
+}
+.tool-link:hover {
+    text-decoration: underline;
+    color: var(--cor-texto);
+}
+</style>

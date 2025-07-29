@@ -1,0 +1,41 @@
+---
+// src/components/Header.astro
+// Este componente parece ser uma versão mais antiga do que estamos usando agora (HeaderControls.astro),
+// mas aqui está a correção para que ele funcione como esperado.
+
+import { Image } from 'astro:assets';
+import { ui } from '../i18n/ui';
+
+// CORREÇÃO: Lógica de tradução mais segura para evitar erros de TypeScript
+const locale = Astro.currentLocale as keyof typeof ui;
+const t = (key: keyof typeof ui[typeof locale]) => {
+  // Usa optional chaining e um fallback para inglês para garantir que nunca falhe
+  return ui[locale]?.[key] || ui['en-US'][key]; 
+};
+
+// IMPORTANTE: Certifique-se que o logo está em 'src/assets/images/'
+// Se você moveu para /public/images/, o caminho deve ser '/images/logo.png'
+// e a tag <Image /> deve ser trocada por <img />
+import logoSrc from '../assets/images/logo.png';
+---
+<header class="standalone-header">
+    <Image src={logoSrc} alt="Logo Mestre Cronista" class="logo" width={100} />
+    <h1>{t('header.title')}</h1>
+    <p>{t('header.tagline')}</p>
+</header>
+
+<style>
+/* Estilos básicos para o header, caso esteja sendo usado separadamente */
+.standalone-header {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-bottom: 2px solid var(--cor-borda);
+  position: relative;
+}
+
+.logo {
+  max-width: 100px;
+  margin-bottom: 1rem;
+  height: auto;
+}
+</style>

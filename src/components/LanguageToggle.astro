@@ -1,0 +1,58 @@
+---
+// src/components/LanguageToggle.astro
+const { pathname } = Astro.url;
+const currentPath = pathname.split('/').slice(2).join('/');
+const isEnglish = Astro.currentLocale === 'en-US';
+---
+<div 
+  class:list={["language-toggle-switch", { "en-active": isEnglish }]} 
+  title="Mudar idioma / Switch language"
+>
+  <a href={`/pt-BR/${currentPath}`} class="lang-label" data-lang-id="pt-BR">PT</a>
+  <div class="toggle-handle"></div>
+  <a href={`/en-US/${currentPath}`} class="lang-label" data-lang-id="en-US">EN</a>
+</div>
+
+<style>
+/* Estilos do seu style.css original para o seletor de idioma */
+.language-toggle-switch {
+    background-color: var(--cor-fundo-item);
+    border: 1px solid var(--cor-borda);
+    border-radius: 20px;
+    width: 70px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: relative;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+.language-toggle-switch:hover { border-color: var(--cor-destaque); }
+.lang-label {
+    font-family: var(--fonte-corpo);
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: var(--cor-texto);
+    z-index: 1;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    flex-grow: 1;
+    text-align: center;
+}
+.toggle-handle {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 30px;
+    height: 30px;
+    background-color: var(--cor-destaque);
+    border-radius: 50%;
+    transition: transform 0.3s ease-in-out;
+}
+.language-toggle-switch.en-active .toggle-handle { transform: translateX(36px); }
+.language-toggle-switch:not(.en-active) a[data-lang-id="pt-BR"] { color: var(--cor-fundo); }
+.light-theme .language-toggle-switch:not(.en-active) a[data-lang-id="pt-BR"] { color: #fff; }
+.language-toggle-switch.en-active a[data-lang-id="en-US"] { color: var(--cor-fundo); }
+.light-theme .language-toggle-switch.en-active a[data-lang-id="en-US"] { color: #fff; }
+</style>

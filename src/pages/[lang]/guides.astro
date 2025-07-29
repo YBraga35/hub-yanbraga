@@ -1,0 +1,94 @@
+---
+// src/pages/[lang]/guides.astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import HeaderControls from '../../components/HeaderControls.astro';
+import { ui } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'pt-BR' } }, { params: { lang: 'en-US' } }];
+}
+
+const locale = Astro.currentLocale as keyof typeof ui;
+const t = (key: keyof typeof ui[typeof locale]) => ui[locale][key];
+---
+<BaseLayout 
+    title={t('nav.guides')}
+    description="Guias e tutoriais para aprimorar suas aventuras de RPG.">
+
+    <Sidebar />
+
+    <main class="content">
+        <HeaderControls />
+
+        <div class="page-header-minimal">
+            <h1>{t('nav.guides')}</h1>
+            <p>Uma coleção de conhecimento para jogadores e mestres, baseada em anos de experiência na mesa de jogo.</p>
+        </div>
+
+        <div class="placeholder-grid">
+            <div class="placeholder-card">
+                <i class="fas fa-user-shield"></i>
+                <h3>Criação de Personagens Memoráveis</h3>
+                <p>Um guia passo a passo para ir além da ficha de personagem, desenvolvendo protagonistas com motivações profundas, falhas críveis e um arco narrativo impactante.</p>
+                <a href="#" class="disabled-link">Ler Guia (Em Breve)</a>
+            </div>
+            <div class="placeholder-card">
+                <i class="fas fa-dungeon"></i>
+                <h3>Mestrando o Horror Gótico</h3>
+                <p>Aprenda a criar tensão, mistério e uma atmosfera opressora. Dicas sobre ritmo, descrição e como usar o desconhecido para assustar seus jogadores.</p>
+                <a href="#" class="disabled-link">Ler Guia (Em Breve)</a>
+            </div>
+            <div class="placeholder-card">
+                <i class="fas fa-feather-alt"></i>
+                <h3>A Arte da Improvisação</h3>
+                <p>Ferramentas e técnicas para pensar rápido e reagir às ações inesperadas dos jogadores, transformando o caos em momentos narrativos inesquecíveis.</p>
+                <a href="#" class="disabled-link">Ler Guia (Em Breve)</a>
+            </div>
+        </div>
+    </main>
+</BaseLayout>
+
+<style is:global>
+.placeholder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+.placeholder-card {
+    background-color: var(--cor-fundo-item);
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.placeholder-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.placeholder-card i {
+    font-size: 2.5rem;
+    color: var(--cor-destaque);
+    margin-bottom: 1rem;
+}
+.placeholder-card h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-destaque);
+    margin-top: 0;
+    font-size: 1.8rem;
+}
+.placeholder-card p {
+    flex-grow: 1;
+}
+.disabled-link {
+    color: var(--cor-borda);
+    cursor: not-allowed;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 1rem;
+    align-self: flex-start;
+}
+</style>

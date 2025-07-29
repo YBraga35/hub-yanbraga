@@ -1,0 +1,50 @@
+---
+// src/components/ThemeSwitcher.astro
+---
+<button class="theme-switcher" id="theme-switcher" aria-label="Mudar tema">
+    <i class="fas fa-sun"></i>
+</button>
+
+<script>
+  // Este script será executado no navegador do cliente
+  const themeSwitcher = document.getElementById('theme-switcher');
+  
+  function applyTheme(theme) {
+    document.documentElement.classList.remove('light-theme', 'dark-theme');
+    document.documentElement.classList.add(theme + '-theme');
+    if (themeSwitcher) {
+      themeSwitcher.innerHTML = (theme === 'light') ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+    }
+    localStorage.setItem('theme', theme);
+  }
+
+  themeSwitcher?.addEventListener('click', () => {
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  });
+
+  // Aplica o tema na carga inicial
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+</script>
+
+<style>
+/* Estilos do seu style.css original */
+.theme-switcher {
+    background-color: var(--cor-fundo-item);
+    border: 1px solid var(--cor-borda);
+    color: var(--cor-texto);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-family: var(--fonte-corpo);
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    font-size: 1rem;
+    line-height: 1;
+}
+.theme-switcher:hover {
+    border-color: var(--cor-destaque);
+    color: var(--cor-destaque);
+}
+</style>

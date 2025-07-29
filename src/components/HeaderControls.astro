@@ -1,0 +1,63 @@
+---
+// src/components/HeaderControls.astro
+import LanguageToggle from './LanguageToggle.astro';
+import ThemeSwitcher from './ThemeSwitcher.astro';
+// IMPORTANTE: Coloque sua logo (ex: logo.png) na pasta /public/images/
+---
+<header class="main-header">
+    <div class="header-left">
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Abrir menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href={`/${Astro.currentLocale}/`} class="desktop-logo-link">
+            <img src="/images/logo.png" alt="Logo Mestre Cronista" class="header-logo" />
+        </a>
+    </div>
+    
+    <div class="header-controls">
+        <LanguageToggle />
+        <ThemeSwitcher /> 
+    </div>
+</header>
+
+<style>
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--cor-texto);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 101;
+}
+.desktop-logo-link {
+    display: block;
+}
+.header-logo {
+    height: 40px;
+    width: auto;
+    display: block;
+}
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+@media (max-width: 992px) {
+    .mobile-menu-toggle { display: block; }
+    .desktop-logo-link { display: none; } /* Esconde o logo no header em mobile */
+}
+</style>

@@ -1,0 +1,74 @@
+---
+// src/components/CampaignCard.astro
+import { ui } from '../i18n/ui';
+
+export interface Props {
+    title: string;
+    banner: string;
+    lang: 'PT-BR' | 'EN-US';
+    theme: string;
+    level: string;
+    players: string;
+    schedule: string;
+    status: 'recruiting' | 'full' | 'finished';
+    hubLink: string;
+}
+
+const { title, banner, lang, theme, level, players, schedule, status, hubLink } = Astro.props;
+
+const locale = Astro.currentLocale as keyof typeof ui;
+const t = (key: keyof typeof ui[typeof locale]) => ui[locale][key];
+
+const statusMap = {
+    recruiting: { text: t('cta.recruiting'), class: 'recruiting' },
+    full: { text: t('cta.full'), class: 'disabled' },
+    finished: { text: t('cta.finished'), class: 'disabled' }
+};
+
+const currentStatus = statusMap[status];
+---
+<div class="campaign-card">
+    <img src={banner} alt={`Banner for ${title}`} class="campaign-banner" />
+    <div class="campaign-info">
+        <h3>{title}</h3>
+        <div class="tags">
+            <span class="tag-lang">{lang}</span>
+            <span class="tag-theme">{t('tag.theme')}: {theme}</span>
+            <span class="tag-level">{t('tag.level')}: {level}</span>
+        </div>
+        <div class="details">
+            <p><i class="fas fa-users"></i> {t('details.players')}: {players}</p>
+            <p><i class="fas fa-calendar-alt"></i> {t('details.schedule')}: {schedule}</p>
+        </div>
+        <a href={hubLink} class:list={["cta-button", currentStatus.class]}>
+            {currentStatus.text}
+        </a>
+    </div>
+</div>
+
+<style>
+/* Estilos do seu style.css original para os cards de campanha */
+.campaign-card { background-color: var(--cor-fundo-item); border: 1px solid var(--cor-borda); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
+.campaign-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); border-color: var(--cor-destaque); }
+.campaign-banner { width: 100%; height: 180px; object-fit: cover; }
+.campaign-info { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+.campaign-info h3 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 1.8rem; margin: 0 0 0.5rem 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.tags span { padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+.tag-lang { background-color: var(--cor-destaque); color: var(--cor-fundo); }
+html.light-theme .tag-lang { color: #f0e9e0; }
+.tag-theme { background-color: #4a4a52; color: var(--cor-texto); }
+html.light-theme .tag-theme { background-color: #e0d8c9; color: #5c4e42; }
+.tag-level { background-color: #6d6d7a; color: var(--cor-texto); }
+html.light-theme .tag-level { background-color: #c9c1b6; color: #5c4e42; }
+.details { margin-bottom: 1.5rem; font-size: 1rem; flex-grow: 1; }
+.details p { margin: 0.5rem 0; display: flex; align-items: center; }
+.details i { margin-right: 10px; color: var(--cor-destaque); width: 20px; text-align: center; }
+.cta-button { display: inline-block; padding: 0.8rem 1.5rem; border-radius: 5px; text-align: center; text-decoration: none; font-weight: bold; transition: background-color 0.3s ease, color 0.3s ease; border: none; cursor: pointer; align-self: flex-start; margin-top: auto; }
+.cta-button.recruiting { background-color: #28a745; color: #fff; }
+.cta-button.recruiting:hover { background-color: #218838; }
+.cta-button.disabled { background-color: var(--cor-borda); color: #999; cursor: not-allowed; }
+.cta-button.contact { background-color: var(--cor-destaque); color: var(--cor-fundo); }
+html.light-theme .cta-button.contact { color: #fff; }
+.cta-button.contact:hover { background-color: #b98151; }
+</style>

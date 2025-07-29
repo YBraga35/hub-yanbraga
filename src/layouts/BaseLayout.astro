@@ -1,0 +1,77 @@
+---
+// src/layouts/BaseLayout.astro
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang={Astro.currentLocale === 'en-US' ? 'en' : 'pt-BR'}>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title} | Mestre Cronista</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;700;1,400;700&family=MedievalSharp&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      })();
+
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark-theme');
+        document.documentElement.classList.add('light-theme');
+      } else {
+        document.documentElement.classList.remove('light-theme');
+        document.documentElement.classList.add('dark-theme');
+      }
+    </script>
+</head>
+<body>
+    <div class="main-container">
+        <slot />
+    </div>
+    <div class="mobile-menu-overlay"></div>
+
+    {/* CORREÇÃO: Script simplificado e mais robusto usando delegação de eventos, 
+        garantindo que o menu funcione de forma confiável em todas as páginas. */}
+    <script>
+      // Esta função lida com todos os cliques que podem abrir ou fechar o menu.
+      const handleMobileMenuClicks = (event: MouseEvent) => {
+        const target = event.target as HTMLElement;
+        const isSidebarOpen = document.body.classList.contains('sidebar-open');
+
+        // Verifica se o clique foi no botão de menu, no overlay, ou em um link da sidebar (quando ela está aberta).
+        const shouldToggleMenu = 
+          target.closest('#mobile-menu-toggle') ||
+          target.closest('.mobile-menu-overlay') ||
+          (isSidebarOpen && target.closest('.sidebar a'));
+
+        if (shouldToggleMenu) {
+          document.body.classList.toggle('sidebar-open');
+        }
+      };
+
+      // Adiciona o listener de clique uma única vez ao documento.
+      // Ele continuará funcionando mesmo após as transições de página do Astro.
+      document.addEventListener('click', handleMobileMenuClicks);
+    </script>
+</body>
+</html>

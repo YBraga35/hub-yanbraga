@@ -1,0 +1,156 @@
+---
+// src/components/ScheduleTable.astro
+import { ui } from '../i18n/ui';
+
+export interface Game {
+    day: string;
+    time: string;
+    name: string;
+    theme: string;
+    vacancies: string;
+    lang: string;
+    level: string;
+    frequency: string;
+    price: string;
+    payment: string;
+    status: 'recruiting' | 'full' | 'available';
+    link: string;
+}
+
+export interface Props {
+    games: Game[];
+}
+
+const { games } = Astro.props;
+const locale = Astro.currentLocale as keyof typeof ui;
+const t = (key: keyof typeof ui[typeof locale]) => ui[locale][key];
+---
+
+<div class="schedule-wrapper">
+    <table class="schedule-table">
+        <thead>
+            <tr>
+                <th>{t('schedule.header.day')}</th>
+                <th>{t('schedule.header.time')}</th>
+                <th>{t('schedule.header.campaign')}</th>
+                <th>{t('schedule.header.details')}</th>
+                <th>{t('schedule.header.price')}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {games.map(game => (
+                <tr class:list={[game.status]}>
+                    <td>{game.day}</td>
+                    <td>{game.time}</td>
+                    <td>
+                        <div class="campaign-name">{game.name}</div>
+                        <div class="campaign-theme">{game.theme}</div>
+                    </td>
+                    <td>
+                        <div class="details-grid">
+                            <span><i class="fas fa-users"></i> {t('schedule.status.vacancies')}: {game.vacancies}</span>
+                            <span><i class="fas fa-language"></i> {t('schedule.status.language')}: {game.lang}</span>
+                            <span><i class="fas fa-layer-group"></i> {t('schedule.status.level')}: {game.level}</span>
+                            <span><i class="fas fa-sync-alt"></i> {t('schedule.status.frequency')}: {game.frequency}</span>
+                            <span><i class="fas fa-credit-card"></i> {t('schedule.status.payment')}: {game.payment}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <a href={game.link} class:list={["cta-button", game.status]} target="_blank">
+                            {game.status === 'recruiting' ? t('cta.recruiting') : game.status === 'full' ? t('cta.full') : t('schedule.available')}
+                        </a>
+                    </td>
+                </tr>
+            ))}
+        </tbody>
+    </table>
+</div>
+
+<style>
+/* Estilos para a tabela de horários */
+.schedule-wrapper {
+    overflow-x: auto; /* Garante a rolagem horizontal em telas pequenas */
+    margin-top: 2rem;
+}
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--cor-fundo-item);
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    overflow: hidden;
+    min-width: 800px; /* Força a rolagem em vez de quebrar o layout */
+}
+.schedule-table th, .schedule-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--cor-borda);
+}
+.schedule-table th {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-destaque);
+    font-size: 1.5rem;
+    font-weight: normal;
+}
+.schedule-table td {
+    vertical-align: middle;
+}
+.schedule-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.campaign-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+.campaign-theme {
+    font-size: 0.9rem;
+    color: var(--cor-texto);
+    opacity: 0.8;
+}
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+.details-grid span {
+    display: flex;
+    align-items: center;
+}
+.details-grid i {
+    margin-right: 8px;
+    color: var(--cor-destaque);
+    width: 16px;
+    text-align: center;
+}
+.cta-button {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.cta-button.recruiting { background-color: #28a745; color: #fff; }
+.cta-button.recruiting:hover { background-color: #218838; }
+.cta-button.full { background-color: var(--cor-borda); color: #999; cursor: not-allowed; }
+.cta-button.available { background-color: var(--cor-destaque); color: var(--cor-fundo); }
+html.light-theme .cta-button.available { color: #fff; }
+.cta-button.available:hover { background-color: #b98151; }
+
+/* Destaque para linhas disponíveis */
+tr.available {
+    background-color: #2f2a24;
+}
+html.light-theme tr.available {
+    background-color: #f7f2ec;
+}
+tr.available .campaign-name {
+    color: var(--cor-destaque);
+    font-style: italic;
+}
+</style>

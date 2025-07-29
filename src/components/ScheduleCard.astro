@@ -1,0 +1,162 @@
+---
+// src/components/ScheduleCard.astro
+import { ui } from '../i18n/ui';
+// CORREÇÃO: A interface 'Game' agora é importada do arquivo de dados central.
+import type { Game } from '../data/campaigns';
+
+// A interface Props agora espera um objeto 'game' que corresponde
+// ao tipo 'Game' acrescido da propriedade 'status' que adicionamos na página.
+export interface Props {
+    game: Game & { status: 'recruiting' | 'full' | 'available' };
+}
+
+const { game } = Astro.props;
+const locale = Astro.currentLocale as keyof typeof ui;
+const t = (key: keyof typeof ui[typeof locale]) => ui[locale][key];
+
+const statusMap = {
+    recruiting: { text: t('cta.recruiting'), class: 'recruiting' },
+    full: { text: t('cta.full'), class: 'full' },
+    available: { text: t('schedule.available'), class: 'available' }
+};
+const currentStatus = statusMap[game.status];
+---
+<div class:list={["schedule-card", game.status]}>
+    <img src={game.image} alt={`Banner for ${game.name}`} class="card-banner" />
+    <div class="card-content">
+        <div class="card-header">
+            <span class="day-time">{game.day} - {game.time}</span>
+            <h3>{game.name}</h3>
+            <p class="theme">{game.theme}</p>
+        </div>
+        <div class="card-details">
+            <span><i class="fas fa-users"></i> {t('schedule.status.vacancies')}: <strong>{game.vacancies}</strong></span>
+            <span><i class="fas fa-language"></i> {t('schedule.status.language')}: <strong>{game.lang}</strong></span>
+            <span><i class="fas fa-layer-group"></i> {t('schedule.status.level')}: <strong>{game.level}</strong></span>
+            <span><i class="fas fa-sync-alt"></i> {t('schedule.status.frequency')}: <strong>{game.frequency}</strong></span>
+            <span><i class="fas fa-credit-card"></i> {t('schedule.status.payment')}: <strong>{game.payment}</strong></span>
+            <span><i class="fas fa-money-bill-wave"></i> {t('schedule.header.price')}: <strong>{game.price}</strong></span>
+        </div>
+        <div class="card-footer">
+            <button class="details-button" data-modal-target=`#${game.name.replace(/\s+/g, '-')}`>
+                <i class="fas fa-info-circle"></i> {t('card.cta.details')}
+            </button>
+            <a href={game.link} class:list={["cta-button", currentStatus.class]} target="_blank" rel="noopener noreferrer">
+                {currentStatus.text}
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal com a premissa da campanha -->
+<div id=`${game.name.replace(/\s+/g, '-')}` class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close" aria-label={t('modal.close')}>&times;</button>
+        <h3>{game.name}</h3>
+        <p>{game.premise}</p>
+    </div>
+</div>
+
+<style>
+/* Estilos para o novo card */
+.schedule-card {
+    background-color: var(--cor-fundo-item);
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.schedule-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+.card-banner { width: 100%; height: 180px; object-fit: cover; }
+.card-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+.card-header .day-time { font-size: 0.9rem; font-weight: bold; color: var(--cor-destaque); }
+.card-header h3 { font-family: var(--fonte-titulo); font-size: 1.8rem; margin: 0.25rem 0 0.5rem 0; }
+.card-header .theme { font-size: 1rem; margin: 0; font-style: italic; opacity: 0.9; }
+.card-details {
+    margin: 1.5rem 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+}
+.card-details span { display: flex; align-items: center; }
+.card-details i { margin-right: 8px; color: var(--cor-destaque); width: 16px; text-align: center; }
+.card-footer { margin-top: auto; display: flex; justify-content: space-between; gap: 1rem; }
+.details-button, .cta-button {
+    flex-grow: 1;
+    padding: 0.75rem;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+.details-button {
+    background: transparent;
+    border: 1px solid var(--cor-borda);
+    color: var(--cor-texto);
+}
+.details-button:hover { background-color: var(--cor-borda); color: var(--cor-destaque); }
+.cta-button.recruiting { background-color: #28a745; color: #fff; }
+.cta-button.recruiting:hover { background-color: #218838; }
+.cta-button.full { background-color: var(--cor-borda); color: #999; cursor: not-allowed; }
+
+/* Estilos para o Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-content {
+    background-color: var(--cor-fundo-item);
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    border: 1px solid var(--cor-borda);
+    transform: scale(0.9);
+    transition: transform 0.3s;
+}
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--cor-texto);
+    cursor: pointer;
+}
+.modal-content h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-destaque);
+    margin-top: 0;
+    font-size: 2rem;
+}
+</style>
